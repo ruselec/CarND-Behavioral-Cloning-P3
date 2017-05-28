@@ -57,10 +57,39 @@ And after downsampling angles with zero value:
 ![alt text][image2]
 
 Also I used left and right camera images with angle's correction:
-'''
+```
   correction = 0.2*(1 + random.random()/2.0) 
   angles.append(angle)
   angles.append(angle+correction)
   angles.append(angle-correction)
-'''
+```
 
+## Model Architecture and Training Strategy
+
+### 1. Solution Design Approach
+
+### 2. Final Model Architecture
+
+| Layer         		      |     Description	        					            | 
+|:---------------------:  |:---------------------------------------------:| 
+| Input         		      | 65x200x3 RGB image   							            | 
+| Convolution 5x5     	  | 2x2 stride, valid padding,  24 depth          |
+| ELU					            |												                        |
+| Convolution 5x5	        | 2x2 stride, valid padding, 36 depth         	|
+| ELU					            |												                        |
+| Convolution 5x5	        | 2x2 stride, valid padding, 48 depth       	  |
+| ELU					            |												                        |
+| Convolution 3x3	        | 1x1 stride, valid padding, 64 depth         	|
+| ELU					            |												                        |
+| Convolution 3x3	        | 1x1 stride, valid padding, 64 depth       	  |
+| ELU					            |												                        |
+| Flatten 					      |	                                              |	
+| Dense           	      |    							                             	|
+| RELU					          |												                        |
+| Dense           	      |    							                             	|
+| RELU					          |												                        |
+| Dense           	      |    							                             	|
+| RELU					          |												                        |
+| Dense           	      |    							                             	|
+
+### 3.Creation of the training dataset and training process 
