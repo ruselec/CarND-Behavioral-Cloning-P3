@@ -97,19 +97,21 @@ Here is the final model architecture:
 | Convolution 3x3	        | 1x1 stride, valid padding, 64 depth       	  |
 | ELU					            |												                        |
 | Flatten 					      |	                                              |	
-| Dense           	      |    							                             	|
+| Dense           	      | 1164 neurons							                    |
 | RELU					          |												                        |
-| Dense           	      |    							                             	|
+| Dense           	      | 100 neurons   							                 	|
 | RELU					          |												                        |
-| Dense           	      |    							                             	|
+| Dense           	      | 50 neurons 							                     	|
 | RELU					          |												                        |
-| Dense           	      |    							                             	|
+| Dense           	      | 20 neurons   							                   	|
+| RELU					          |												                        |
+| Dense           	      | 1 neuron   							                   	  |
 
 ### 3.Creation of the training dataset and training process 
 
 To generate more instances of training data augmentation was used (code lines 84-113, 122-123).
 
-Here is examples of augmentation:
+Here are examples of augmentation:
 
 ![alt text][image4]
 
@@ -119,13 +121,13 @@ Here is examples of augmentation:
 
 The image is cropped above the horizon and below the car to reduce the amount of information the network is required to learn. Next the image is resized to further reduce required processing (code lines 78-82, 124).
 
-Here is examples of image preprocessing:
+Here are examples of image preprocessing:
 
 ![alt text][image3]
 
 #### Prediction of angle stearing for test images
 
-Here is an predictions of angle stearing by trained model:
+Here are predictions of angle stearing by trained model:
 
 ![alt text][image6]
 
