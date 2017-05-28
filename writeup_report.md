@@ -76,7 +76,7 @@ For testing model Python Notebook file Visualisation_Data.ipynb was created. For
 * set parameters of model (number of layers, activation functions), colorspace (RGB, HSV, YUV), correction for rignt and left camera images (0.05-0.4)
 * training of model for 20 epochs and saving checkpoint for each epoch
 * testing model chekpoints in simulator and save the best results
-* come back to first punkt and repeat process again
+* come back to first par. and repeat process again
 
 ### 2. Final Model Architecture
 
