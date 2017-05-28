@@ -16,6 +16,7 @@ The goals / steps of this project are the following:
 [image3]: ./examples/preprocess.jpg
 [image4]: ./examples/augment1.jpg
 [image5]: ./examples/augment2.jpg
+[image6]: ./examples/predict.jpg
 
 ## Files Submitted & Code Quality
 
@@ -71,11 +72,20 @@ Also I used left and right camera images with angle's correction:
 
 ### 1. Solution Design Approach
 
+For testing model Python Notebook file Visualisation_Data.ipynb was created. For solution design itterated process was used:
+* set parameters of model (number of layers, activation functions), colorspace (RGB, HSV, YUV), correction for rignt and left camera images (0.05-0.4)
+* training of model for 20 epochs and saving checkpoint for each epoch
+* testing model chekpoints in simulator and save the best results
+* come back to first punkt and repeat process again
+
 ### 2. Final Model Architecture
+
+Here is the final model architecture:
 
 | Layer         		      |     Description	        					            | 
 |:---------------------:  |:---------------------------------------------:| 
-| Input         		      | 65x200x3 RGB image   							            | 
+| Input         		      | 65x200x3 RGB image   							            |
+| Lambda        		      | Normalization (-1, 1)  							          |
 | Convolution 5x5     	  | 2x2 stride, valid padding,  24 depth          |
 | ELU					            |												                        |
 | Convolution 5x5	        | 2x2 stride, valid padding, 36 depth         	|
@@ -99,7 +109,7 @@ Also I used left and right camera images with angle's correction:
 
 To generate more instances of training data augmentation was used (code lines 84-113, 122-123).
 
-Here is an example of augmentation:
+Here is examples of augmentation:
 
 ![alt text][image4]
 
@@ -109,9 +119,15 @@ Here is an example of augmentation:
 
 The image is cropped above the horizon and below the car to reduce the amount of information the network is required to learn. Next the image is resized to further reduce required processing (code lines 78-82, 124).
 
-Here is an examples of image preprocessing:
+Here is examples of image preprocessing:
 
 ![alt text][image3]
+
+#### Prediction of angle stearing for test images
+
+Here is an predictions of angle stearing by trained model:
+
+![alt text][image6]
 
 # Simulation
 
