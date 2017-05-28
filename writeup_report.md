@@ -13,6 +13,9 @@ The goals / steps of this project are the following:
 [//]: # (Image References)
 [image1]: ./examples/hist1.jpg
 [image2]: ./examples/hist2.jpg
+[image3]: ./examples/preprocess.jpg
+[image4]: ./examples/augment1.jpg
+[image5]: ./examples/augment2.jpg
 
 ## Files Submitted & Code Quality
 
@@ -93,3 +96,23 @@ Also I used left and right camera images with angle's correction:
 | Dense           	      |    							                             	|
 
 ### 3.Creation of the training dataset and training process 
+
+To generate more instances of training data augmentation was used (code lines 84-113, 122-123).
+
+Here is an example of augmentation:
+
+![alt text][image4]
+
+![alt text][image5]
+
+#### Image Preprocessing 
+
+The image is cropped above the horizon and below the car to reduce the amount of information the network is required to learn. Next the image is resized to further reduce required processing (code lines 78-82, 124).
+
+Here is an examples of image preprocessing:
+
+![alt text][image3]
+
+# Simulation
+
+The final model was tested in simulator. The speed was limited in drive.py file on 20. The car went around the training track almost on the centre of the road. 
