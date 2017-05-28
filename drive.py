@@ -3,6 +3,7 @@ import base64
 from datetime import datetime
 import os
 import shutil
+import cv2
 
 import numpy as np
 import socketio
@@ -44,14 +45,8 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 9
+set_speed = 20
 controller.set_desired(set_speed)
-
-def crop_camera(img):
-	height = img.shape[0]
-	y_start = 50
-	y_stop = height-20
-	return img[y_start:y_stop, :]
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -66,7 +61,10 @@ def telemetry(sid, data):
 		imgString = data["image"]
 		image = Image.open(BytesIO(base64.b64decode(imgString)))
 		image_array = np.asarray(image)
-		image_array = crop_camera(image_array)
+		new_img = image_array[70:135,:,:]
+		image_array = cv2.resize(new_img,(200, 65), interpolation = cv2.INTER_AREA)
+		# сonvert to YUV color space (as nVidia paper suggests)
+		#image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2YUV)
 		steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
 		throttle = controller.update(float(speed))
 		print(steering_angle, throttle)
