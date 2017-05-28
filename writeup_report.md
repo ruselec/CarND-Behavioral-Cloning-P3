@@ -24,7 +24,9 @@ My project includes the following files:
 * video.mp4 for a video of the car using model.h5 on the first track
 
 To run the code start the simulator in autonomous mode, open shell and type
+
 <code>python drive.py model.h5<code>
+
 The code in model.py uses a Python generator to generate data for training rather than storing the training data in memory. 
 
 ## Model Architecture and Training Strategy
@@ -55,6 +57,7 @@ And after downsampling angles with zero value:
 ![alt text][image2]
 
 Also I used left and right camera images with angle's correction:
+
 <code> 
 correction = 0.2*(1 + random.random()/2.0) 
 angles.append(angle)
