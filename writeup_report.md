@@ -57,10 +57,10 @@ And after downsampling angles with zero value:
 ![alt text][image2]
 
 Also I used left and right camera images with angle's correction:
-
+'''
   correction = 0.2*(1 + random.random()/2.0) 
   angles.append(angle)
   angles.append(angle+correction)
   angles.append(angle-correction)
-
+'''
 
