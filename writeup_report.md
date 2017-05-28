@@ -46,7 +46,7 @@ Adam optimizer is used (code line 193).
 ### 4. Appropriate training data
 
 Training data has been chosen to induce the desired behavior in the simulation (i.e. keeping the car on the track) (code lines 23-70). 
-Data rowa have been chosen where speed > 20. Data rows with angle = 0 have beebn downsampled approx. by 90 % to balance dataset.
+Data rows have been chosen where speed > 20. Data rows with angle = 0 have beebn downsampled approx. by 90 % to balance dataset.
 
 Here is histogram of angles before downsampling angles with zero value:
 
@@ -58,12 +58,11 @@ And after downsampling angles with zero value:
 
 Also I used left and right camera images with angle's correction:
 
-<code> 
-correction = 0.2*(1 + random.random()/2.0) 
-angles.append(angle)
-# Add correction for steering for left images
-angles.append(angle+correction)
-# Minus correction for steering for right images
-angles.append(angle-correction)
-</code>
+  correction = 0.2*(1 + random.random()/2.0) 
+  angles.append(angle)
+  # Add correction for steering for left images
+  angles.append(angle+correction)
+  # Minus correction for steering for right images
+  angles.append(angle-correction)
+
 
