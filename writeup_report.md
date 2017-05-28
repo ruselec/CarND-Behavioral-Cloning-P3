@@ -12,7 +12,7 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 [image1]: ./examples/hist1.jpg
-[image1]: ./examples/hist2.jpg
+[image2]: ./examples/hist2.jpg
 
 ## Files Submitted & Code Quality
 
@@ -25,7 +25,7 @@ My project includes the following files:
 
 To run the code start the simulator in autonomous mode, open shell and type
 
-<code>python drive.py model.h5<code>
+<code>python drive.py model.h5</code>
 
 The code in model.py uses a Python generator to generate data for training rather than storing the training data in memory. 
 
@@ -65,5 +65,5 @@ angles.append(angle)
 angles.append(angle+correction)
 # Minus correction for steering for right images
 angles.append(angle-correction)
-<code>
+</code>
 
