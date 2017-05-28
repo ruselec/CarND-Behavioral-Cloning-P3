@@ -60,9 +60,7 @@ Also I used left and right camera images with angle's correction:
 
   correction = 0.2*(1 + random.random()/2.0) 
   angles.append(angle)
-  # Add correction for steering for left images
   angles.append(angle+correction)
-  # Minus correction for steering for right images
   angles.append(angle-correction)
 
 
