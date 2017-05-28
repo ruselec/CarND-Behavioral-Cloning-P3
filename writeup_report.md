@@ -107,7 +107,7 @@ Here is the final model architecture:
 | RELU					          |												                        |
 | Dense           	      | 1 neuron   							                   	  |
 
-### 3.Creation of the training dataset and training process 
+### 3. Creation of the training dataset and training process 
 
 To generate more instances of training data augmentation was used (code lines 84-113, 122-123).
 
