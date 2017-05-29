@@ -17,6 +17,7 @@ The goals / steps of this project are the following:
 [image4]: ./examples/augment1.jpg
 [image5]: ./examples/augment2.jpg
 [image6]: ./examples/predict.jpg
+[image7]: ./examples/loss.jpg
 
 ## Files Submitted & Code Quality
 
@@ -41,11 +42,17 @@ My model is based on Nvidia end-to-end model of convolution neural network with 
 
 ### 2. Attempts to reduce overfitting in the model
 
-Train/validation splits have been used with test size 0.1 (code lines 75-76).
+To prevent overfitting in the model I used:
+
+* train/validation splits with test size 0.1 (code lines 75-76)
+* shuffling of training data (code line 130)
+* comparing training and validation set loss by plotting results after each epoch ending and choosing the checkpoint for epoch where validation loss is not increasing (sixth checkpoint was chosen that matching 5 on the plot below).
+
+![alt text][image7]
 
 ### 3. Model parameter tuning
 
-Adam optimizer is used (code line 193).
+Adam optimizer is used as it has given good results, the learning rate of 0.001 works good (code line 193).
 
 ### 4. Appropriate training data
 
