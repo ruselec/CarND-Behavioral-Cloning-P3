@@ -6,7 +6,7 @@ import cv2
 from skimage import draw
 from keras.models import load_model
 
-model = None
+model = load_model('model09.h5')
 lines = []
 image_paths = []
 with open('./data/driving_log.csv') as csvfile:
@@ -47,10 +47,9 @@ def preprocess_image(img):
 	return new_img
 
 def make_frame(t):
-	num = int(t*24)
+	num = int(t*12)
 	img = mpimg.imread(image_paths[num])
 	new_img = preprocess_image(img)
-	model = load_model('model09.h5')
 	angle = model.predict(new_img[None,:,:,:])
 	#draw pred angle
 	blue = (25,160,235)
@@ -61,6 +60,6 @@ def make_frame(t):
 	img, angle = draw_angle_line(img, angle, green)
 	return img
 
-clip = mpy.VideoClip(make_frame, duration=100) # 100 seconds
-clip.write_videofile("video_predict.mp4",fps=24, codec='mpeg4')
+clip = mpy.VideoClip(make_frame, duration=200) # 100 seconds
+clip.write_videofile("video_predict.mp4",fps=12, codec='mpeg4', bitrate="50000k")
 #clip.write_gif("data.gif",fps=60)
