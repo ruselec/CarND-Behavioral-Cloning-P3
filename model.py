@@ -20,8 +20,10 @@ from keras.callbacks import ModelCheckpoint, Callback
 from keras.regularizers import l2
 import time
 
+dataset_name=''
+
 lines = []
-with open('./data/driving_log.csv') as csvfile:
+with open('./'+dataset_name+'/driving_log.csv') as csvfile:
     reader = csv.reader(csvfile)
     for line in reader:
         lines.append(line)
@@ -38,7 +40,6 @@ for line in lines:
     k+=1
     
 angles = np.array(angles)   
-plt.hist(angles.astype('float'), bins=30) 
 
 image_paths = []
 angles = []
@@ -48,14 +49,14 @@ for line in lines:
     if (k > 0):
         angle = float(line[3])
         speed = float(line[6])
-        if (speed > 20):
+        if (speed > 0):
             if ((random.random() > 0.9)and(angle==0))or(angle>0):
                 for i in range(3):
                     # Load images from center, left and right cameras
                     source_path = line[i]
                     tokens = source_path.split('/')
                     filename = tokens[-1]
-                    local_path = "./data/IMG/" + filename
+                    local_path = './'+dataset_name + '/' + source_path 
                     image_paths.append(local_path)
                 correction = 0.2*(1 + random.random()/2.0)
 
@@ -76,9 +77,9 @@ image_paths_train, image_paths_val, angles_train, angles_val = train_test_split(
                                                                                   test_size=0.1, random_state=17)
 
 def preprocess_image(img):
-    new_img = img[70:135,:,:]
-    # scale to 65x200x3 (same as nVidia)
-    new_img = cv2.resize(new_img,(200, 65), interpolation = cv2.INTER_AREA)
+    new_img = img[60:135,:,:]
+    # scale to 64x64x3 
+    new_img = cv2.resize(new_img,(64, 64), interpolation = cv2.INTER_AREA)
     return new_img
 
 def augment_brightness_camera_images(image):
@@ -112,37 +113,41 @@ def add_random_shadow(image):
     image = cv2.cvtColor(image_hls,cv2.COLOR_HLS2RGB)
     return image
 
+def flip_image(img, steering):
+    if random.randint(0, 1):
+        return cv2.flip(img, 1), -steering
+    else:
+        return img, steering	
+
+def trans_image(image,steer,x_range, y_range):
+    # Translation
+    tr_x = np.random.randint(-x_range, x_range+1)
+    steer_ang = steer + tr_x*.004
+    tr_y = np.random.randint(-y_range, y_range+1)
+    Trans_M = np.float32([[1,0,tr_x],[0,1,tr_y]])
+    image_tr = cv2.warpAffine(image,Trans_M,(320,160))
+    return image_tr,steer_ang
+		
 def generate_training_data(image_paths, angles, batch_size=128, validation_flag=False):
-    image_paths, angles = shuffle(image_paths, angles)
-    X,y = ([],[])
-    while True:       
-        for i in range(len(angles)):
-            img = mpimg.imread(image_paths[i])
-            angle = angles[i]
-            img = augment_brightness_camera_images(img)
-            img = add_random_shadow(img)
-            img = preprocess_image(img)
-            X.append(img)
-            y.append(angle)
-            if len(X) == batch_size:
-                yield (np.array(X), np.array(y))
-                X, y = ([],[])
-                image_paths, angles = shuffle(image_paths, angles)
-            # flip horizontally and invert steer angle, if magnitude is > 0
-            if abs(angle) > 0:
-                flipped_img = np.fliplr(img)
-                flipped_angle = -angle
-                X.append(flipped_img)
-                y.append(flipped_angle)
-            if len(X) == batch_size:
-                yield (np.array(X), np.array(y))
-                X, y = ([],[])
-                image_paths, angles = shuffle(image_paths, angles)
+	image_paths, angles = shuffle(image_paths, angles)
+	X,y = ([],[])
+	while True:       
+		for i in range(len(angles)):
+			img = mpimg.imread(image_paths[i])
+			angle = angles[i]
+			img = augment_brightness_camera_images(img)
+			img, angle = trans_image(img, angle, 50,20)
+			img = add_random_shadow(img)
+			img, angle = flip_image(img, angle)
+			img = preprocess_image(img)
+			X.append(img)
+			y.append(angle)
+			if len(X) == batch_size:
+				yield (np.array(X), np.array(y))
+				X, y = ([],[])
 				
-BATCH_SIZE = 64
-H, W, CH = 65, 200, 3
-LR = 1e-4
-L2_REG_SCALE = 0.
+BATCH_SIZE = 128
+ch, row, col = 3, 64, 64
 
 class debugCallback(Callback):
     def on_epoch_end(self, batch, logs={}):
@@ -161,42 +166,26 @@ class debugCallback(Callback):
         #Print predicted driving angle for first example
         print("Predicted: "+', '.join(['%.3f']*len(x)) % tuple(angles))
 
-def nvidia_model():
+def commaai_model():
     model = Sequential()
+    model.add(Lambda(lambda x: x/127.5 - 1.,
+                     input_shape=(row, col, ch),
+                     output_shape=(row, col, ch)))
+    model.add(Convolution2D(16, (8, 8), subsample=(4, 4), padding='same', activation="relu"))
+    model.add(Convolution2D(32, (5, 5), subsample=(2, 2), padding='same', activation="relu"))
+    model.add(Convolution2D(64, (5, 5), subsample=(2, 2), padding='same'))
+    model.add(Flatten())
+    model.add(Activation('relu'))
+    model.add(Dense(1024, activation="relu"))
+    model.add(Dropout(.5))
+    model.add(Dense(1))
+    adam = Adam(lr=0.001)
+    model.compile(optimizer=adam, loss='mean_squared_error')
 
-    model.add(Lambda(lambda x: x/127.5 - 1.,input_shape=(65,200,3)))
-
-    model.add(Convolution2D(24, (5, 5), padding="valid", strides=(2, 2), 
-                            kernel_initializer='he_normal', name='conv1'))
-    model.add(ELU())
-    model.add(Convolution2D(36, (5, 5), padding="valid", strides=(2, 2), 
-                            kernel_initializer='he_normal', name='conv2'))
-    model.add(ELU())
-    model.add(Convolution2D(48, (5, 5), padding="valid", strides=(2, 2), 
-                            kernel_initializer='he_normal', name='conv3'))
-    model.add(ELU())
-    model.add(Convolution2D(64, (3, 3), padding="valid", 
-                            kernel_initializer='he_normal', name='conv4'))
-    model.add(ELU())
-    model.add(Convolution2D(64, (3, 3), padding="valid", 
-                            kernel_initializer='he_normal', name='conv5'))
-    model.add(Flatten(name='flatten1'))
-    model.add(Dense(1164, kernel_initializer='he_normal', name='dense1', activation='relu'))
-    model.add(Dense(100, kernel_initializer='he_normal', name='dense2', activation='relu'))
-
-    model.add(Dense(50, kernel_initializer='he_normal', name='dense3', activation='relu'))
-
-    model.add(Dense(10, kernel_initializer='he_normal', name='dense4', activation='relu'))
-
-    model.add(Dense(1, kernel_initializer='he_normal', name='dense5'))
-
-    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.01)
-    model.compile(optimizer=adam, loss='mse')
-    
-    return model  
+    return model
     
     
-model = nvidia_model()
+model = commaai_model()
 # initialize generators
 train_gen = generate_training_data(image_paths_train, angles_train,
                                    validation_flag=False, batch_size=BATCH_SIZE)
@@ -206,10 +195,10 @@ checkpoint = ModelCheckpoint('model{epoch:02d}.h5')
 debug = debugCallback()
 train_start_time = time.time()
 history_object = model.fit_generator(callbacks=[checkpoint, debug], generator=train_gen, 
-                                     validation_data=val_gen, epochs=6,
-                                     steps_per_epoch=image_paths_train.shape[0]*2/BATCH_SIZE, 
+                                     validation_data=val_gen, epochs=15,
+                                     steps_per_epoch=8000/BATCH_SIZE, 
                                      verbose=1, 
-                                     validation_steps=image_paths_val.shape[0]*2/BATCH_SIZE)
+                                     validation_steps=128/BATCH_SIZE)
 total_time = time.time() - train_start_time
 print('Total training time: %.2f sec (%.2f min)' % (total_time, total_time/60))
 

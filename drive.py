@@ -22,6 +22,8 @@ app = Flask(__name__)
 model = None
 prev_image_array = None
 
+import collections
+steering_vector = collections.deque(maxlen=5)
 
 class SimplePIController:
     def __init__(self, Kp, Ki):
@@ -45,8 +47,20 @@ class SimplePIController:
 
 
 controller = SimplePIController(0.1, 0.002)
-set_speed = 20
+set_speed = 30
 controller.set_desired(set_speed)
+
+def limit_speed(steering_angle):
+	global set_speed
+	if (abs(steering_angle) > 0.3):
+		set_speed = 12
+	elif (abs(steering_angle) > 0.1): 
+		set_speed = 15
+	elif (abs(steering_angle) > 0.05):
+		set_speed = 25
+	else:
+		set_speed = 30
+	controller.set_desired(set_speed)
 
 @sio.on('telemetry')
 def telemetry(sid, data):
@@ -61,12 +75,16 @@ def telemetry(sid, data):
 		imgString = data["image"]
 		image = Image.open(BytesIO(base64.b64decode(imgString)))
 		image_array = np.asarray(image)
-		new_img = image_array[70:135,:,:]
-		image_array = cv2.resize(new_img,(200, 65), interpolation = cv2.INTER_AREA)
+		new_img = image_array[32:135,:,:]
+		image_array = cv2.resize(new_img,(64, 64), interpolation = cv2.INTER_AREA)
 		# сonvert to YUV color space (as nVidia paper suggests)
 		#image_array = cv2.cvtColor(image_array, cv2.COLOR_RGB2YUV)
 		steering_angle = float(model.predict(image_array[None, :, :, :], batch_size=1))
+		steering_vector.append(steering_angle)
+		steering_angle = np.mean(steering_vector)
+		limit_speed(steering_angle)
 		throttle = controller.update(float(speed))
+		#throttle = 0.5
 		print(steering_angle, throttle)
 		send_control(steering_angle, throttle)
 
