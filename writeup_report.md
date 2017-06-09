@@ -38,7 +38,7 @@ The code in model.py uses a Python generator to generate data for training rathe
 
 ### 1. An appropriate model architecture has been employed
 
-My model is based on Nvidia end-to-end model of convolution neural network with 5x5 and 3x3 filter sizes and depths between 24 and 64 (model.py lines 164-196). The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer (code line 167).
+My model is based on comma.ai model of convolution neural network with 8x8 and 5x5 filter sizes and depths between 16 and 64 (model.py lines 164-196). The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer (code line 167).
 
 ### 2. Attempts to reduce overfitting in the model
 
@@ -46,7 +46,7 @@ To prevent overfitting in the model I used:
 
 * train/validation splits with test size 0.1 (code lines 75-76)
 * shuffling of training data (code line 130)
-* comparing training and validation set loss by plotting results after each epoch ending and choosing the checkpoint for epoch where validation loss is not increasing (sixth checkpoint was chosen that matching 5 on the plot below).
+* comparing training and validation set loss by plotting results after each epoch ending and choosing the checkpoint for epoch where validation loss is not increasing (last checkpoint was chosen that matching 14 on the plot below).
 
 ![alt text][image7]
 
@@ -57,7 +57,7 @@ Adam optimizer is used as it has given good results, the learning rate of 0.001 
 ### 4. Appropriate training data
 
 Training data has been chosen to induce the desired behavior in the simulation (i.e. keeping the car on the track) (code lines 23-70). 
-Data rows have been chosen where speed > 20. Data rows with angle = 0 have beebn downsampled approx. by 90 % to balance dataset.
+Data rows have been chosen where speed > 0. Data rows with angle = 0 have beebn downsampled approx. by 90 % to balance dataset.
 
 Here is histogram of angles before downsampling angles with zero value:
 
@@ -81,7 +81,7 @@ Also I used left and right camera images with angle's correction:
 
 For testing model Python Notebook file Visualisation_Data.ipynb was created. For solution design itterated process was used:
 * set parameters of model (number of layers, activation functions), colorspace (RGB, HSV, YUV), correction for rignt and left camera images (0.05-0.4)
-* training of model for 20 epochs and saving checkpoint for each epoch
+* training of model for 15 epochs and saving checkpoint for each epoch
 * testing model chekpoints in simulator and save the best results
 * come back to first par. and repeat process again
 
@@ -91,27 +91,18 @@ Here is the final model architecture:
 
 | Layer         		      |     Description	        					            | 
 |:---------------------:  |:---------------------------------------------:| 
-| Input         		      | 65x200x3 RGB image   							            |
+| Input         		      | 64x64x3 RGB image   							            |
 | Lambda        		      | Normalization (-1, 1)  							          |
-| Convolution 5x5     	  | 2x2 stride, valid padding,  24 depth          |
-| ELU					            |												                        |
-| Convolution 5x5	        | 2x2 stride, valid padding, 36 depth         	|
-| ELU					            |												                        |
-| Convolution 5x5	        | 2x2 stride, valid padding, 48 depth       	  |
-| ELU					            |												                        |
-| Convolution 3x3	        | 1x1 stride, valid padding, 64 depth         	|
-| ELU					            |												                        |
-| Convolution 3x3	        | 1x1 stride, valid padding, 64 depth       	  |
-| ELU					            |												                        |
+| Convolution 8x8     	  | 4x4 stride, same padding, 16 depth            |
+| RELU					          |												                        |
+| Convolution 5x5	        | 2x2 stride, same padding, 32 depth          	|
+| RELU					          |												                        |
+| Convolution 5x5	        | 2x2 stride, same padding, 64 depth       	    |
 | Flatten 					      |	                                              |	
-| Dense           	      | 1164 neurons							                    |
 | RELU					          |												                        |
-| Dense           	      | 100 neurons   							                 	|
+| Dense           	      | 1024 neurons							                    |
 | RELU					          |												                        |
-| Dense           	      | 50 neurons 							                     	|
-| RELU					          |												                        |
-| Dense           	      | 20 neurons   							                   	|
-| RELU					          |												                        |
+| Dropout           	    | 0.5            							                 	|
 | Dense           	      | 1 neuron   							                   	  |
 
 ### 3. Creation of the training dataset and training process 
@@ -140,4 +131,5 @@ Here are predictions of angle stearing by trained model:
 
 # Simulation
 
-The final model was tested in simulator. The speed was limited in drive.py file on 20. The car went around the training track almost on the centre of the road. 
+The final model was tested in simulator. The speed was limited by value 12 on sharp turns in drive.py file. 
+The car went around the first and second tracks almost on the centre of the road. 
