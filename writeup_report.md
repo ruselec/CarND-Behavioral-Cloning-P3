@@ -18,6 +18,7 @@ The goals / steps of this project are the following:
 [image5]: ./examples/augment2.jpg
 [image6]: ./examples/predict.jpg
 [image7]: ./examples/loss.jpg
+[image8]: ./examples/trans.jpg
 
 ## Files Submitted & Code Quality
 
@@ -38,15 +39,16 @@ The code in model.py uses a Python generator to generate data for training rathe
 
 ### 1. An appropriate model architecture has been employed
 
-My model is based on comma.ai model of convolution neural network with 8x8 and 5x5 filter sizes and depths between 16 and 64 (model.py lines 164-196). The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer (code line 167).
+My model is based on comma.ai model of convolution neural network with 8x8 and 5x5 filter sizes and depths between 16 and 64. The model includes RELU layers to introduce nonlinearity, and the data is normalized in the model using a Keras lambda layer.
 
 ### 2. Attempts to reduce overfitting in the model
 
 To prevent overfitting in the model I used:
 
-* train/validation splits with test size 0.1 (code lines 75-76)
-* shuffling of training data (code line 130)
-* comparing training and validation set loss by plotting results after each epoch ending and choosing the checkpoint for epoch where validation loss is not increasing (last checkpoint was chosen that matching 14 on the plot below).
+* train/validation splits with test size 0.1 
+* shuffling of training data
+* comparing training and validation set loss by plotting results after each epoch ending and choosing the checkpoint for epoch where validation loss is not increasing (last checkpoint was chosen that matching 14 on the plot below)
+* dropout layer before last neuron
 
 ![alt text][image7]
 
@@ -56,7 +58,7 @@ Adam optimizer is used as it has given good results, the learning rate of 0.001 
 
 ### 4. Appropriate training data
 
-Training data has been chosen to induce the desired behavior in the simulation (i.e. keeping the car on the track) (code lines 23-70). 
+Training data has been chosen to induce the desired behavior in the simulation (i.e. keeping the car on the track). 
 Data rows have been chosen where speed > 0. Data rows with angle = 0 have beebn downsampled approx. by 90 % to balance dataset.
 
 Here is histogram of angles before downsampling angles with zero value:
@@ -107,7 +109,7 @@ Here is the final model architecture:
 
 ### 3. Creation of the training dataset and training process 
 
-To generate more instances of training data augmentation was used (code lines 84-113, 122-123).
+To generate more instances of training data augmentation was used.
 
 Here are examples of augmentation:
 
@@ -115,9 +117,11 @@ Here are examples of augmentation:
 
 ![alt text][image5]
 
+![alt text][image8]
+
 #### Image Preprocessing 
 
-The image is cropped above the horizon and below the car to reduce the amount of information the network is required to learn. Next the image is resized to further reduce required processing (code lines 78-82, 124).
+The image is cropped above the horizon and below the car to reduce the amount of information the network is required to learn. Next the image is resized to further reduce required processing.
 
 Here are examples of image preprocessing:
 
